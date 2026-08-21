@@ -129,10 +129,13 @@ spin.addEventListener('pointercancel',()=>{
 });
 
 function finish(){
-  document.getElementById('lock').hidden=true;document.getElementById('done').hidden=false;
   const N={A:'Ace',J:'Jack',Q:'Queen',K:'King'},U={C:'Clubs',H:'Hearts',S:'Spades',D:'Diamonds'};
-  document.getElementById('c1').textContent=(N[captured[0]]||captured[0])+' of '+U[captured[1]];
-  document.getElementById('c2').textContent=(N[captured[2]]||captured[2])+' of '+U[captured[3]];
+  const card1=(N[captured[0]]||captured[0])+' of '+U[captured[1]];
+  const card2=(N[captured[2]]||captured[2])+' of '+U[captured[3]];
+  const payload=card1+'|'+card2;
+  const url='shortcuts://run-shortcut?name='+encodeURIComponent('VOX Bridge')+
+            '&input=text&text='+encodeURIComponent(payload);
+  window.location.href=url;
 }
 function resetAll(){
   cancelAnimationFrame(raf); phase=0; selectedIndex=8; captured=[];
