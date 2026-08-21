@@ -152,9 +152,10 @@ async function finish(){
   const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
   const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
 
-  // Jonathan's marked-deck/top-card handling:
-  // Inputted Card Value - Named Card Value + 1, wrapped to 1..52.
-  const raw=inputtedValue-namedValue+1;
+  // Rotating Mnemonica handling:
+  // Named Card Value - Inputted/key Card Value + 1, wrapped to 1..52.
+  // Example: key 8H=14 => 8H becomes position 1; 3H=28 => 15; 9D=52 => 39.
+  const raw=namedValue-inputtedValue+1;
   const position=((raw-1)%52+52)%52+1;
 
   let copied=false, copyMethod='';
@@ -176,7 +177,7 @@ async function finish(){
   document.getElementById('done').hidden=false;
   document.getElementById('c1').textContent='Named: '+card1+' → '+namedValue;
   document.getElementById('c2').textContent='Key: '+card2+' → '+inputtedValue;
-  document.getElementById('calc').textContent=inputtedValue+' − '+namedValue+' + 1 = '+raw+' → '+position;
+  document.getElementById('calc').textContent=namedValue+' − '+inputtedValue+' + 1 = '+raw+' → '+position;
   document.getElementById('clip').textContent=copied?'Clipboard: '+position+' ✓':'Clipboard copy FAILED';
 }
 function resetAll(){
