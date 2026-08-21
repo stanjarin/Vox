@@ -17,3 +17,5 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #fake{position:fixed;inset:0;background:#222;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:#aaa;font-size:25px}
 #fake[hidden]{display:none}
 #done{position:fixed;inset:0;background:#f2f2f7;color:#111;padding:65px 28px}#done p{font-size:24px}
+
+#done #calc,#done #clip{font-size:20px}#done #clip{font-weight:600}
