@@ -1,1 +1,1 @@
-VOX spinner prototype V1 — standalone Quick-route ergonomics test only. Four sequential selections: Card 1 value, Card 1 suit, Card 2 value, Card 2 suit. Press centred selection to lock; four locks fill fake passcode dots. Final diagnostic screen displays both captured cards. No VOX integration and no Delay route yet.
+V2: 9-key spinner only. Value/suit/value/suit. Tap settled 9-key to lock. 0 after Card 1 invokes 30-second fake-Home placeholder. Emergency resets. Diagnostic endpoint only.
