@@ -84,26 +84,49 @@ function lockSelection(){
   buildTrack();
 }
 
+let holdTimer=null, holdArmed=false, moved=false;
+const HOLD_MS=240;
 spin.addEventListener('pointerdown',e=>{
   cancelAnimationFrame(raf);
-  drag=true; yStart=yLast=e.clientY; tLast=performance.now(); velocity=0;
+  drag=true; moved=false; holdArmed=false;
+  yStart=yLast=e.clientY; tLast=performance.now(); velocity=0;
   spin.setPointerCapture(e.pointerId);
+  holdTimer=setTimeout(()=>{
+    if(drag && !moved){
+      holdArmed=true;
+      spin.animate([{transform:'scale(1)'},{transform:'scale(.96)'},{transform:'scale(1)'}],
+                   {duration:120,easing:'ease-out'});
+    }
+  },HOLD_MS);
 });
 spin.addEventListener('pointermove',e=>{
   if(!drag)return;
   const now=performance.now(), dy=e.clientY-yLast, dt=Math.max(1,now-tLast);
+  if(Math.abs(e.clientY-yStart)>7){
+    moved=true; holdArmed=false; clearTimeout(holdTimer);
+  }
   velocity=(dy/dt)*1000;
   setOffset(rubber(offset+dy));
   yLast=e.clientY; tLast=now;
 });
 spin.addEventListener('pointerup',e=>{
   if(!drag)return;
+  clearTimeout(holdTimer);
   const travel=Math.abs(e.clientY-yStart);
   drag=false;
-  if(travel<7){snapTo(Math.round(-offset/ITEM_H),false); setTimeout(lockSelection,80);}
-  else releaseMomentum(velocity);
+  if(travel<7){
+    if(holdArmed){
+      snapTo(Math.round(-offset/ITEM_H),false);
+      setTimeout(lockSelection,60);
+    } else {
+      snapTo(Math.round(-offset/ITEM_H),false);
+    }
+  } else releaseMomentum(velocity);
 });
-spin.addEventListener('pointercancel',()=>{drag=false;snapTo(Math.round(-offset/ITEM_H),true)});
+spin.addEventListener('pointercancel',()=>{
+  clearTimeout(holdTimer); drag=false; holdArmed=false;
+  snapTo(Math.round(-offset/ITEM_H),true);
+});
 
 function finish(){
   document.getElementById('lock').hidden=true;document.getElementById('done').hidden=false;
