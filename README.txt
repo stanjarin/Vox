@@ -1,14 +1,6 @@
-VOX covert-input prototype V7 — corrected rotating-stack arithmetic.
-
-V6's 52-card Mnemonica dictionary was correct; the subtraction direction was wrong.
-
-Correct marked-deck/top-card calculation:
-  Named Card Value - Inputted/key Card Value + 1
-then wrap into 1..52.
-
-Anchor check when 8H (Mnemonica 14) is the top/key card:
-  8H -> 1
-  3H (28) -> 15
-  9D (52) -> 39
-
-V7 still shows the diagnostic screen and copies the normalized final position to clipboard.
+VOX covert-input prototype V8
+- V7 verified lookup/arithmetic retained.
+- After Card 2 locks, final position is silently copied to Clipboard.
+- Diagnostic screen removed.
+- iOS Home-screen web apps cannot dismiss themselves programmatically. On iPhone 8 Plus, press the physical Home button immediately after the fourth lock to reach the REAL Home screen.
+- Existing Siri Shortcut remains untouched: Get Clipboard -> Speak “Let’s try [Clipboard].”

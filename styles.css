@@ -19,3 +19,5 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #done{position:fixed;inset:0;background:#f2f2f7;color:#111;padding:65px 28px}#done p{font-size:24px}
 
 #done #calc,#done #clip{font-size:20px}#done #clip{font-weight:600}
+
+#done{position:fixed;inset:0;background:#000;padding:0}.doneHome{position:absolute;inset:0;background:#000}

@@ -146,39 +146,28 @@ spin.addEventListener('pointercancel',()=>{
 });
 
 async function finish(){
-  const N={A:'Ace',J:'Jack',Q:'Queen',K:'King'},U={C:'Clubs',H:'Hearts',S:'Spades',D:'Diamonds'};
-  const card1=(N[captured[0]]||captured[0])+' of '+U[captured[1]];
-  const card2=(N[captured[2]]||captured[2])+' of '+U[captured[3]];
   const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
   const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
-
-  // Rotating Mnemonica handling:
-  // Named Card Value - Inputted/key Card Value + 1, wrapped to 1..52.
-  // Example: key 8H=14 => 8H becomes position 1; 3H=28 => 15; 9D=52 => 39.
   const raw=namedValue-inputtedValue+1;
   const position=((raw-1)%52+52)%52+1;
-
-  let copied=false, copyMethod='';
+  let copied=false;
   try{
     await navigator.clipboard.writeText(String(position));
-    copied=true; copyMethod='Clipboard API';
+    copied=true;
   }catch(e){
     const ta=document.createElement('textarea');
-    ta.value=String(position);
-    ta.setAttribute('readonly','');
+    ta.value=String(position); ta.setAttribute('readonly','');
     ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta);
-    ta.select();
-    try{copied=document.execCommand('copy'); copyMethod='fallback';}catch(_){}
+    document.body.appendChild(ta); ta.select();
+    try{copied=document.execCommand('copy');}catch(_){}
     ta.remove();
   }
-
-  document.getElementById('lock').hidden=true;
-  document.getElementById('done').hidden=false;
-  document.getElementById('c1').textContent='Named: '+card1+' → '+namedValue;
-  document.getElementById('c2').textContent='Key: '+card2+' → '+inputtedValue;
-  document.getElementById('calc').textContent=namedValue+' − '+inputtedValue+' + 1 = '+raw+' → '+position;
-  document.getElementById('clip').textContent=copied?'Clipboard: '+position+' ✓':'Clipboard copy FAILED';
+  if(copied){
+    document.getElementById('lock').hidden=true;
+    document.getElementById('done').hidden=false;
+  }else{
+    phase=2; captured=captured.slice(0,2); selectedIndex=0; buildTrack();
+  }
 }
 function resetAll(){
   cancelAnimationFrame(raf); phase=0; selectedIndex=8; captured=[];
