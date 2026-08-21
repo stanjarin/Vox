@@ -1,1 +1,8 @@
-V2: 9-key spinner only. Value/suit/value/suit. Tap settled 9-key to lock. 0 after Card 1 invokes 30-second fake-Home placeholder. Emergency resets. Diagnostic endpoint only.
+VOX covert-input prototype V3.
+Changes from V2:
+- Spinner rebuilt as a true vertical wheel inside the 9 key.
+- Continuous drag, momentum/deceleration, snap-to-item.
+- Hard top/bottom bounds with rubber-band bounce; no wrap-around.
+- Values start on 9.
+- Resting display always settles on one whole character.
+- Same lock/two-card/delay/reset flow as V2.
