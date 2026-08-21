@@ -56,18 +56,18 @@ function snapTo(index, withBounce=true){
       {transform:`translateY(${offset}px)`},
       {transform:`translateY(${target+overshoot}px)`,offset:.72},
       {transform:`translateY(${target}px)`}
-    ],{duration:300,easing:'cubic-bezier(.18,.89,.32,1.18)'});
-    setTimeout(()=>setOffset(target),300);
+    ],{duration:230,easing:'cubic-bezier(.18,.89,.32,1.18)'});
+    setTimeout(()=>setOffset(target),230);
   }else{
     const anim=track.animate([{transform:`translateY(${offset}px)`},{transform:`translateY(${target}px)`}],
-      {duration:230,easing:'cubic-bezier(.22,.61,.36,1)'});
+      {duration:165,easing:'cubic-bezier(.22,.61,.36,1)'});
     anim.onfinish=()=>setOffset(target);
   }
 }
 
 function releaseMomentum(v){
   cancelAnimationFrame(raf);
-  let pos=offset, vel=v; const min=baseOffsetFor(maxIndex()), max=0;
+  let pos=offset, vel=v*1.75; const min=baseOffsetFor(maxIndex()), max=0;
   let last=performance.now();
   function tick(now){
     const dt=Math.min(32,now-last)/1000; last=now;
@@ -79,7 +79,7 @@ function releaseMomentum(v){
       vel *= Math.pow(.78,dt*60); // stronger damping at boundary
       pos = rubber(pos);
     }else{
-      vel *= Math.pow(.94,dt*60); // iOS-ish deceleration
+      vel *= Math.pow(.972,dt*60); // faster/longer iOS-ish glide
     }
     setOffset(pos);
     if(Math.abs(vel)<18){
@@ -92,12 +92,16 @@ function releaseMomentum(v){
 }
 
 function lockSelection(){
-  // Only lock if settled on a whole item.
+  track.getAnimations().forEach(a=>a.cancel());
   selectedIndex=clamp(Math.round(-offset/ITEM_H),0,maxIndex());
   captured.push(options()[selectedIndex]);
   phase++;
   if(phase===4){finish();return}
-  selectedIndex = 0;
+
+  // Every suit phase must visibly open on C.
+  // Card 2 value phase opens at the start of the value wheel.
+  selectedIndex=0;
+  offset=0;
   buildTrack();
 }
 
@@ -133,8 +137,10 @@ spin.addEventListener('pointerup',e=>{
   drag=false;
   if(travel<7){
     if(holdArmed){
-      snapTo(Math.round(-offset/ITEM_H),false);
-      setTimeout(lockSelection,60);
+      selectedIndex=clamp(Math.round(-offset/ITEM_H),0,maxIndex());
+      track.getAnimations().forEach(a=>a.cancel());
+      setOffset(baseOffsetFor(selectedIndex));
+      setTimeout(lockSelection,35);
     } else {
       snapTo(Math.round(-offset/ITEM_H),false);
     }
