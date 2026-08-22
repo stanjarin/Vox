@@ -28,8 +28,81 @@ function installRank(id){
 ['rank1','rank4','rank7','rank8'].forEach(installRank);
 
 spin.onpointerdown=e=>{if(phase%2!==1)return;pointerDown=true;holdTriggered=false;spin.setPointerCapture(e.pointerId);clearTimeout(holdTimer);holdTimer=setTimeout(()=>{if(pointerDown)holdTriggered=true},HOLD_MS)};
-spin.onpointerup=()=>{if(phase%2!==1)return;clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(was){captured.push(SUITS[suitIndex]);updateEcho();advancePhase();}else{suitIndex=(suitIndex+1)%SUITS.length;track.innerHTML='<div class="witem">'+SUITS[suitIndex]+'</div>'}};
+spin.onpointerup=()=>{
+ if(phase%2!==1)return;
+ clearTimeout(holdTimer);
+ let was=holdTriggered;
+ pointerDown=false;
+ holdTriggered=false;
+
+ if(!was){
+   suitIndex=(suitIndex+1)%SUITS.length;
+   track.innerHTML='<div class="witem">'+SUITS[suitIndex]+'</div>';
+   return;
+ }
+
+ // Card 1 suit: ordinary commit.
+ if(phase===1){
+   captured.push(SUITS[suitIndex]);
+   updateEcho();
+   advancePhase();
+   return;
+ }
+
+ // Card 2 suit: do NOT commit irreversibly until clipboard succeeds.
+ // This keeps tap-to-change and hold-to-retry available on failure.
+ const finalSuit=SUITS[suitIndex];
+ const named=MNEMONICA[captured[0]+' '+captured[1]];
+ const key=MNEMONICA[captured[2]+' '+finalSuit];
+ const raw=named-key+1;
+ const position=((raw-1)%52+52)%52+1;
+
+ if(tryCopyNow(position)){
+   captured.push(finalSuit);
+   updateEcho();
+   phase=4;
+   document.getElementById('lock').hidden=true;
+   document.getElementById('done').hidden=false;
+   return;
+ }
+
+ // Modern clipboard fallback, invoked while finger-release is still the user gesture.
+ if(navigator.clipboard && navigator.clipboard.writeText){
+   navigator.clipboard.writeText(String(position)).then(()=>{
+     captured.push(finalSuit);
+     updateEcho();
+     phase=4;
+     document.getElementById('lock').hidden=true;
+     document.getElementById('done').hidden=false;
+   }).catch(()=>{
+     echo.textContent=captured.join('  ')+'  '+finalSuit+'  !';
+   });
+ }else{
+   echo.textContent=captured.join('  ')+'  '+finalSuit+'  !';
+ }
+};
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
+
+function tryCopyNow(text){
+ const input=document.createElement('input');
+ input.type='text';
+ input.value=String(text);
+ input.setAttribute('readonly','');
+ input.style.position='fixed';
+ input.style.left='1px';
+ input.style.top='1px';
+ input.style.width='2px';
+ input.style.height='2px';
+ input.style.opacity='0.01';
+ input.style.zIndex='-1';
+ document.body.appendChild(input);
+ input.focus({preventScroll:true});
+ input.setSelectionRange(0,input.value.length);
+ let ok=false;
+ try{ok=document.execCommand('copy');}catch(_){}
+ input.remove();
+ return ok;
+}
 
 function finish(){
  const named=MNEMONICA[captured[0]+' '+captured[1]],key=MNEMONICA[captured[2]+' '+captured[3]];
