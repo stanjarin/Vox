@@ -21,6 +21,12 @@ const RANK_GROUPS={
   rank7:['7','8','9'],
   rank8:['10','J','Q','K']
 };
+const RANK_LABELS={
+  rank1:['1','2','3'],
+  rank4:['4','5','6'],
+  rank7:['7','8','9'],
+  rank8:['10','J','Q','K']
+};
 const HOLD_MS=240;
 
 let phase=0;                 // 0 rank1, 1 suit1, 2 rank2, 3 suit2
@@ -35,9 +41,10 @@ const echo=document.getElementById('echo');
 function updateEcho(){ echo.textContent=captured.join('  '); }
 
 function showRankMode(){
-  spin.textContent='9';
+  track.innerHTML='<div class="witem">9</div>';
+  track.style.transition='none';
+  track.style.transform='translateY(0px)';
   spin.style.pointerEvents='none';
-  spin.style.fontSize='31px';
   resetRankKeys();
   updateEcho();
 }
@@ -60,7 +67,7 @@ function resetRankKeys(){
   Object.entries(RANK_GROUPS).forEach(([id,g])=>{
     const b=document.getElementById(id);
     b.dataset.i='0';
-    b.querySelector('span').textContent=g[0];
+    b.querySelector('span').textContent=RANK_LABELS[id][0];
   });
 }
 
@@ -91,7 +98,7 @@ function installRankKey(id){
       let i=Number(btn.dataset.i||0);
       i=(i+(dy<0?1:-1)+group.length)%group.length; // wrap
       btn.dataset.i=String(i);
-      btn.querySelector('span').textContent=group[i];
+      btn.querySelector('span').textContent=RANK_LABELS[id][i];
       lastY=e.clientY;
     }
   });

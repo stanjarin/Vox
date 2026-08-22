@@ -1,16 +1,10 @@
-VOX V8.3
+VOX V8.3.1 — two-point repair only
 
-Changes:
-- Delay: 15 seconds.
-- Lock wallpaper: fixed-proportion square tile, no vertical stretching.
-- Fake Home: rigid image shifted upward; no scaling.
-- Rank input split across passcode buttons:
-  1 = A,2,3
-  4 = 4,5,6
-  7 = 7,8,9
-  8 = 10,J,Q,K
-  Each short wheel wraps and press-hold locks.
-- 9 becomes suit wheel only during suit phases: C,H,S,D.
-  Suit wheel wraps and always opens on C.
-- Emergency remains hard reset.
-- Verified Mnemonica arithmetic / clipboard / Siri architecture unchanged.
+1. Fixes freeze immediately after first rank/value input.
+   Cause: rank mode replaced the 9-key's DOM contents and destroyed the suit wheel track.
+   The track is now preserved and simply displays 9 while inactive.
+
+2. The Ace position on the 1-key is displayed as "1", not "A".
+   Internally it is still captured as Ace for the Mnemonica lookup.
+
+No other V8.3 behavior changed.
