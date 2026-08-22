@@ -1,15 +1,16 @@
-VOX V8.4.6 — clipboard reliability + fail-safe preservation.
+VOX V8.4.7 — rollback to known-good V8 clipboard path.
 
-Visible build number: 8.4.6
+Retained:
+- V8.4 tap-cycle rank/suit input
+- press-and-hold lock
+- 15-second Delay via 0
+- Emergency reset
+- current visuals/backgrounds
+- visible version number
 
-Final Card-2 suit behavior changed:
-- tap still cycles suit;
-- hold still means commit;
-- on the final hold, the app calculates the answer and attempts clipboard copy BEFORE irreversibly committing the suit;
-- if copy succeeds: suit is committed and fake Home appears;
-- if copy fails: app stays on Card-2 suit, shows the prospective suit plus !, and NOTHING is lost.
-  You can tap to change the suit or hold again to retry.
+Changed:
+- removed all experimental clipboard workarounds added after V8
+- restored the exact clipboard implementation from the proven V8 build
+- final Card-2 suit now commits on finger release, then calls that original V8 finish() path
 
-Clipboard copy now first uses a tiny in-viewport input with synchronous execCommand('copy'), then the Clipboard API as fallback.
-
-No Mnemonica, arithmetic, delay, Emergency, or visual behavior changed.
+Visible build number: 8.4.7
