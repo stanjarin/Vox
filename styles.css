@@ -46,3 +46,6 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
   height:auto;
   display:block;
 }
+
+.rankKey,#spin{touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+.rankKey span{pointer-events:none}#track{transition:none!important}
