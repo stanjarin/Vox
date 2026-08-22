@@ -27,8 +27,8 @@ function installRank(id){
 }
 ['rank1','rank4','rank7','rank8'].forEach(installRank);
 
-spin.onpointerdown=e=>{if(phase%2!==1)return;pointerDown=true;holdTriggered=false;spin.setPointerCapture(e.pointerId);clearTimeout(holdTimer);holdTimer=setTimeout(()=>{if(pointerDown){holdTriggered=true;captured.push(SUITS[suitIndex]);updateEcho();advancePhase()}},HOLD_MS)};
-spin.onpointerup=()=>{clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(!was&&phase%2===1){suitIndex=(suitIndex+1)%SUITS.length;track.innerHTML='<div class="witem">'+SUITS[suitIndex]+'</div>'}};
+spin.onpointerdown=e=>{if(phase%2!==1)return;pointerDown=true;holdTriggered=false;spin.setPointerCapture(e.pointerId);clearTimeout(holdTimer);holdTimer=setTimeout(()=>{if(pointerDown)holdTriggered=true},HOLD_MS)};
+spin.onpointerup=()=>{if(phase%2!==1)return;clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(was){captured.push(SUITS[suitIndex]);updateEcho();advancePhase();}else{suitIndex=(suitIndex+1)%SUITS.length;track.innerHTML='<div class="witem">'+SUITS[suitIndex]+'</div>'}};
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 
 function finish(){

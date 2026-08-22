@@ -1,4 +1,11 @@
-VOX V8.4.4
-Diagnostic build only.
-Adds a tiny faint grey version number “8.4.4” in the top-right corner of the fake Lock screen so propagation/cache status is immediately visible.
-No behavior or logic changed from V8.4.3.
+VOX V8.4.5 — exact suit-handler repair.
+
+The previous repair had not actually replaced the live suit handler.
+Verified source showed suit hold was STILL committing/advancing inside the hold timer.
+
+V8.4.5:
+- suit hold timer ONLY arms the lock;
+- suit is captured and phase advances ONLY on finger release;
+- therefore final Card-2 suit release performs finish()/clipboard from the actual user gesture;
+- visible build number updated to 8.4.5.
+No other behavior changed.
