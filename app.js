@@ -48,28 +48,59 @@ spin.onpointerup=()=>{
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 
 async function finish(){
-  const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
-  const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
-  const raw=namedValue-inputtedValue+1;
-  const position=((raw-1)%52+52)%52+1;
-  let copied=false;
-  try{
-    await navigator.clipboard.writeText(String(position));
-    copied=true;
-  }catch(e){
-    const ta=document.createElement('textarea');
-    ta.value=String(position); ta.setAttribute('readonly','');
-    ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    try{copied=document.execCommand('copy');}catch(_){}
-    ta.remove();
-  }
-  if(copied){
-    document.getElementById('lock').hidden=true;
-    document.getElementById('done').hidden=false;
-  }else{
-    phase=2; captured=captured.slice(0,2); selectedIndex=0; buildTrack();
-  }
+ const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
+ const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
+ const raw=namedValue-inputtedValue+1;
+ const position=((raw-1)%52+52)%52+1;
+ const text=String(position);
+
+ let copied=false;
+
+ // Fire several Clipboard API writes immediately from the same final user gesture.
+ // We do not mutate card state while these are attempted.
+ if(navigator.clipboard && navigator.clipboard.writeText){
+   const attempts=[];
+   for(let i=0;i<3;i++){
+     try{
+       attempts.push(
+         navigator.clipboard.writeText(text)
+           .then(()=>true)
+           .catch(()=>false)
+       );
+     }catch(_){}
+   }
+   if(attempts.length){
+     try{
+       const results=await Promise.all(attempts);
+       copied=results.some(Boolean);
+     }catch(_){}
+   }
+ }
+
+ // Known-good legacy fallback, still only after the committed final suit.
+ if(!copied){
+   const ta=document.createElement('textarea');
+   ta.value=text;
+   ta.setAttribute('readonly','');
+   ta.style.position='fixed';
+   ta.style.opacity='0';
+   ta.style.left='-9999px';
+   document.body.appendChild(ta);
+   ta.focus();
+   ta.select();
+   ta.setSelectionRange(0,ta.value.length);
+   try{copied=document.execCommand('copy');}catch(_){}
+   ta.remove();
+ }
+
+ if(copied){
+   document.getElementById('lock').hidden=true;
+   document.getElementById('done').hidden=false;
+ }else{
+   // Preserve all four inputs. Another hold on the same suit simply retries.
+   echo.textContent=captured.join('  ')+'  !';
+   phase=3;
+ }
 }
 function resetAll(){clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}
 window.resetAll=resetAll;
