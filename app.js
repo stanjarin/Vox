@@ -1,7 +1,4 @@
-const VALUES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SUITS=['C','H','S','D'];
-const ITEM_H=76;
-
 const MNEMONICA={
 'A C':43,'A H':51,'A S':7,'A D':39,
 '2 C':27,'2 H':2,'2 S':10,'2 D':19,
@@ -18,144 +15,139 @@ const MNEMONICA={
 'K C':18,'K H':35,'K S':31,'K D':26
 };
 
-let phase=0, selectedIndex=8, captured=[]; // start on 9
-let drag=false, yStart=0, yLast=0, tLast=0, velocity=0, offset=0, raf=0;
-const spin=document.getElementById('spin'), track=document.getElementById('track'), echo=document.getElementById('echo');
-
-function options(){return phase%2===0?VALUES:SUITS}
-function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
-function maxIndex(){return options().length-1}
-function baseOffsetFor(i){return -i*ITEM_H}
-
-function buildTrack(){
-  track.innerHTML='';
-  options().forEach(v=>{
-    const d=document.createElement('div'); d.className='witem'; d.textContent=v; track.appendChild(d);
-  });
-  selectedIndex=clamp(selectedIndex,0,maxIndex());
-  offset=baseOffsetFor(selectedIndex);
-  track.style.transform=`translateY(${offset}px)`;
-  echo.textContent=captured.join('  ');
-}
-
-function rubber(pos){
-  const min=baseOffsetFor(maxIndex()), max=0;
-  if(pos>max) return max+(pos-max)*0.28;
-  if(pos<min) return min+(pos-min)*0.28;
-  return pos;
-}
-function setOffset(v){offset=v;track.style.transform=`translateY(${v}px)`}
-
-function snapTo(index, withBounce=true){
-  cancelAnimationFrame(raf);
-  selectedIndex=clamp(index,0,maxIndex());
-  const target=baseOffsetFor(selectedIndex);
-  if(withBounce && (selectedIndex===0 || selectedIndex===maxIndex())){
-    const overshoot=selectedIndex===0?10:-10;
-    track.animate([
-      {transform:`translateY(${offset}px)`},
-      {transform:`translateY(${target+overshoot}px)`,offset:.72},
-      {transform:`translateY(${target}px)`}
-    ],{duration:230,easing:'cubic-bezier(.18,.89,.32,1.18)'});
-    setTimeout(()=>setOffset(target),230);
-  }else{
-    const anim=track.animate([{transform:`translateY(${offset}px)`},{transform:`translateY(${target}px)`}],
-      {duration:165,easing:'cubic-bezier(.22,.61,.36,1)'});
-    anim.onfinish=()=>setOffset(target);
-  }
-}
-
-function releaseMomentum(v){
-  cancelAnimationFrame(raf);
-  let pos=offset, vel=v*1.75; const min=baseOffsetFor(maxIndex()), max=0;
-  let last=performance.now();
-  function tick(now){
-    const dt=Math.min(32,now-last)/1000; last=now;
-    pos += vel*dt;
-    const beyondTop=pos>max, beyondBottom=pos<min;
-    if(beyondTop || beyondBottom){
-      const bound=beyondTop?max:min;
-      vel += (bound-pos)*42*dt;   // spring back
-      vel *= Math.pow(.78,dt*60); // stronger damping at boundary
-      pos = rubber(pos);
-    }else{
-      vel *= Math.pow(.972,dt*60); // faster/longer iOS-ish glide
-    }
-    setOffset(pos);
-    if(Math.abs(vel)<18){
-      snapTo(Math.round(-pos/ITEM_H), true);
-      return;
-    }
-    raf=requestAnimationFrame(tick);
-  }
-  raf=requestAnimationFrame(tick);
-}
-
-function lockSelection(){
-  track.getAnimations().forEach(a=>a.cancel());
-  selectedIndex=clamp(Math.round(-offset/ITEM_H),0,maxIndex());
-  captured.push(options()[selectedIndex]);
-  phase++;
-  if(phase===4){finish();return}
-
-  // Every suit phase must visibly open on C.
-  // Card 2 value phase opens at the start of the value wheel.
-  selectedIndex=0;
-  offset=0;
-  buildTrack();
-}
-
-let holdTimer=null, holdArmed=false, moved=false;
+const RANK_GROUPS={
+  rank1:['A','2','3'],
+  rank4:['4','5','6'],
+  rank7:['7','8','9'],
+  rank8:['10','J','Q','K']
+};
 const HOLD_MS=240;
-spin.addEventListener('pointerdown',e=>{
-  cancelAnimationFrame(raf);
-  drag=true; moved=false; holdArmed=false;
-  yStart=yLast=e.clientY; tLast=performance.now(); velocity=0;
-  spin.setPointerCapture(e.pointerId);
-  holdTimer=setTimeout(()=>{
-    if(drag && !moved){
-      holdArmed=true;
-      spin.animate([{transform:'scale(1)'},{transform:'scale(.96)'},{transform:'scale(1)'}],
-                   {duration:120,easing:'ease-out'});
+
+let phase=0;                 // 0 rank1, 1 suit1, 2 rank2, 3 suit2
+let captured=[];
+let suitIndex=0;
+let suitDown=false,suitY0=0,suitLastY=0,suitMoved=false,suitHold=false,suitTimer=null;
+
+const spin=document.getElementById('spin');
+const track=document.getElementById('track');
+const echo=document.getElementById('echo');
+
+function updateEcho(){ echo.textContent=captured.join('  '); }
+
+function showRankMode(){
+  spin.textContent='9';
+  spin.style.pointerEvents='none';
+  spin.style.fontSize='31px';
+  resetRankKeys();
+  updateEcho();
+}
+
+function buildSuitTrack(){
+  track.innerHTML='';
+  SUITS.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='witem'; d.textContent=s; track.appendChild(d);
+  });
+  suitIndex=0; // always C
+  track.style.transform='translateY(0px)';
+  spin.style.pointerEvents='auto';
+  updateEcho();
+}
+
+function showSuitMode(){ buildSuitTrack(); }
+
+function resetRankKeys(){
+  Object.entries(RANK_GROUPS).forEach(([id,g])=>{
+    const b=document.getElementById(id);
+    b.dataset.i='0';
+    b.querySelector('span').textContent=g[0];
+  });
+}
+
+function advancePhase(){
+  phase++;
+  if(phase===4){ finish(); return; }
+  if(phase%2===1) showSuitMode(); else showRankMode();
+}
+
+function installRankKey(id){
+  const btn=document.getElementById(id), group=RANK_GROUPS[id];
+  let down=false,y0=0,lastY=0,moved=false,hold=false,timer=null;
+
+  btn.addEventListener('pointerdown',e=>{
+    if(phase%2!==0)return;
+    down=true; moved=false; hold=false; y0=lastY=e.clientY;
+    btn.setPointerCapture(e.pointerId);
+    timer=setTimeout(()=>{ if(down&&!moved) hold=true; },HOLD_MS);
+  });
+
+  btn.addEventListener('pointermove',e=>{
+    if(!down)return;
+    const dy=e.clientY-lastY;
+    if(Math.abs(e.clientY-y0)>6){
+      moved=true; hold=false; clearTimeout(timer);
     }
-  },HOLD_MS);
+    if(Math.abs(dy)>=16){
+      let i=Number(btn.dataset.i||0);
+      i=(i+(dy<0?1:-1)+group.length)%group.length; // wrap
+      btn.dataset.i=String(i);
+      btn.querySelector('span').textContent=group[i];
+      lastY=e.clientY;
+    }
+  });
+
+  btn.addEventListener('pointerup',()=>{
+    if(!down)return;
+    clearTimeout(timer); down=false;
+    if(hold){
+      const i=Number(btn.dataset.i||0);
+      captured.push(group[i]);
+      updateEcho();
+      advancePhase();
+    }
+  });
+  btn.addEventListener('pointercancel',()=>{clearTimeout(timer);down=false;});
+}
+
+['rank1','rank4','rank7','rank8'].forEach(installRankKey);
+
+// Suit wheel: deliberately simple and smooth because only four entries.
+spin.addEventListener('pointerdown',e=>{
+  if(phase%2!==1)return;
+  suitDown=true; suitMoved=false; suitHold=false; suitY0=suitLastY=e.clientY;
+  spin.setPointerCapture(e.pointerId);
+  suitTimer=setTimeout(()=>{if(suitDown&&!suitMoved)suitHold=true;},HOLD_MS);
 });
 spin.addEventListener('pointermove',e=>{
-  if(!drag)return;
-  const now=performance.now(), dy=e.clientY-yLast, dt=Math.max(1,now-tLast);
-  if(Math.abs(e.clientY-yStart)>7){
-    moved=true; holdArmed=false; clearTimeout(holdTimer);
+  if(!suitDown)return;
+  const dy=e.clientY-suitLastY;
+  if(Math.abs(e.clientY-suitY0)>6){
+    suitMoved=true; suitHold=false; clearTimeout(suitTimer);
   }
-  velocity=(dy/dt)*1000;
-  setOffset(rubber(offset+dy));
-  yLast=e.clientY; tLast=now;
+  if(Math.abs(dy)>=16){
+    suitIndex=(suitIndex+(dy<0?1:-1)+SUITS.length)%SUITS.length; // wrap
+    track.style.transition='transform 90ms ease-out';
+    track.style.transform=`translateY(${-suitIndex*76}px)`;
+    suitLastY=e.clientY;
+  }
 });
-spin.addEventListener('pointerup',e=>{
-  if(!drag)return;
-  clearTimeout(holdTimer);
-  const travel=Math.abs(e.clientY-yStart);
-  drag=false;
-  if(travel<7){
-    if(holdArmed){
-      selectedIndex=clamp(Math.round(-offset/ITEM_H),0,maxIndex());
-      track.getAnimations().forEach(a=>a.cancel());
-      setOffset(baseOffsetFor(selectedIndex));
-      setTimeout(lockSelection,35);
-    } else {
-      snapTo(Math.round(-offset/ITEM_H),false);
-    }
-  } else releaseMomentum(velocity);
+spin.addEventListener('pointerup',()=>{
+  if(!suitDown)return;
+  clearTimeout(suitTimer); suitDown=false;
+  if(suitHold){
+    captured.push(SUITS[suitIndex]);
+    updateEcho();
+    advancePhase();
+  }
 });
-spin.addEventListener('pointercancel',()=>{
-  clearTimeout(holdTimer); drag=false; holdArmed=false;
-  snapTo(Math.round(-offset/ITEM_H),true);
-});
+spin.addEventListener('pointercancel',()=>{clearTimeout(suitTimer);suitDown=false;});
 
 async function finish(){
   const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
-  const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
-  const raw=namedValue-inputtedValue+1;
+  const keyValue=MNEMONICA[captured[2]+' '+captured[3]];
+  const raw=namedValue-keyValue+1;
   const position=((raw-1)%52+52)%52+1;
+
   let copied=false;
   try{
     await navigator.clipboard.writeText(String(position));
@@ -168,23 +160,37 @@ async function finish(){
     try{copied=document.execCommand('copy');}catch(_){}
     ta.remove();
   }
+
   if(copied){
     document.getElementById('lock').hidden=true;
     document.getElementById('done').hidden=false;
   }else{
-    phase=2; captured=captured.slice(0,2); selectedIndex=0; buildTrack();
+    // Fail-safe: retain Card 1, restart Card 2.
+    phase=2; captured=captured.slice(0,2); showRankMode();
   }
 }
+
 function resetAll(){
-  cancelAnimationFrame(raf); phase=0; selectedIndex=8; captured=[];
-  document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;buildTrack();
+  phase=0; captured=[]; suitIndex=0;
+  document.getElementById('done').hidden=true;
+  document.getElementById('fake').hidden=true;
+  document.getElementById('lock').hidden=false;
+  showRankMode();
 }
 window.resetAll=resetAll;
 
 document.getElementById('zero').onclick=()=>{
   if(phase!==2)return;
-  document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=false;
-  setTimeout(()=>{if(phase===2){document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false}},30000);
+  document.getElementById('lock').hidden=true;
+  document.getElementById('fake').hidden=false;
+  setTimeout(()=>{
+    if(phase===2){
+      document.getElementById('fake').hidden=true;
+      document.getElementById('lock').hidden=false;
+      showRankMode();
+    }
+  },15000);
 };
+
 document.getElementById('reset').onclick=resetAll;
-buildTrack();
+showRankMode();

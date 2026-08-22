@@ -1,13 +1,13 @@
 <!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Lock</title>
-<link rel="stylesheet" href="styles.css?v=8.2"></head><body>
+<link rel="stylesheet" href="styles.css?v=8.3"></head><body>
 <main id="lock">
   <div class="top"><div class="lockicon"><span class="shackle"></span><span class="lockbody"></span></div><div>Enter Passcode</div><div id="echo" class="echoField"></div></div>
   <div class="pad">
-    <button>1</button><button>2<small>ABC</small></button><button>3<small>DEF</small></button>
-    <button>4<small>GHI</small></button><button>5<small>JKL</small></button><button>6<small>MNO</small></button>
-    <button>7<small>PQRS</small></button><button>8<small>TUV</small></button>
+    <button id="rank1" class="rankKey"><span>A</span></button><button>2<small>ABC</small></button><button>3<small>DEF</small></button>
+    <button id="rank4" class="rankKey"><span>4</span><small>GHI</small></button><button>5<small>JKL</small></button><button>6<small>MNO</small></button>
+    <button id="rank7" class="rankKey"><span>7</span><small>PQRS</small></button><button id="rank8" class="rankKey"><span>10</span><small>TUV</small></button>
     <div id="spin" class="key spin" aria-label="spinner"><div id="track"></div></div>
     <i></i><button id="zero">0</button><i></i>
   </div>
@@ -15,4 +15,4 @@
 </main>
 <section id="fake" hidden><img src="home-content.png" alt=""></section>
 <section id="done" hidden><img src="home-content.png" alt=""></section>
-<script src="app.js?v=8.2"></script></body></html>
+<script src="app.js?v=8.3"></script></body></html>
