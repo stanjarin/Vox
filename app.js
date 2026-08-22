@@ -31,17 +31,42 @@ spin.onpointerdown=e=>{if(phase%2!==1)return;pointerDown=true;holdTriggered=fals
 spin.onpointerup=()=>{clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(!was&&phase%2===1){suitIndex=(suitIndex+1)%SUITS.length;track.innerHTML='<div class="witem">'+SUITS[suitIndex]+'</div>'}};
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 
-async function finish(){
+function finish(){
  const named=MNEMONICA[captured[0]+' '+captured[1]],key=MNEMONICA[captured[2]+' '+captured[3]];
  const raw=named-key+1,position=((raw-1)%52+52)%52+1;
+
+ // First choice: synchronous copy while we are still inside the final finger-release gesture.
  let copied=false;
- try{await navigator.clipboard.writeText(String(position));copied=true}catch(e){
-  const ta=document.createElement('textarea');ta.value=String(position);ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
-  try{copied=document.execCommand('copy')}catch(_){}
-  ta.remove();
+ const ta=document.createElement('textarea');
+ ta.value=String(position);
+ ta.setAttribute('readonly','');
+ ta.style.position='fixed';
+ ta.style.left='-9999px';
+ ta.style.top='0';
+ document.body.appendChild(ta);
+ ta.focus();
+ ta.select();
+ ta.setSelectionRange(0,ta.value.length);
+ try{ copied=document.execCommand('copy'); }catch(_){}
+ ta.remove();
+
+ if(copied){
+   document.getElementById('lock').hidden=true;
+   document.getElementById('done').hidden=false;
+   return;
  }
- if(copied){document.getElementById('lock').hidden=true;document.getElementById('done').hidden=false}
- else{phase=2;captured=captured.slice(0,2);showRankMode()}
+
+ // Backup only. Crucially: NEVER throw away Card 2 if clipboard fails.
+ if(navigator.clipboard && navigator.clipboard.writeText){
+   navigator.clipboard.writeText(String(position)).then(()=>{
+     document.getElementById('lock').hidden=true;
+     document.getElementById('done').hidden=false;
+   }).catch(()=>{
+     echo.textContent=captured.join('  ')+'  !';
+   });
+ }else{
+   echo.textContent=captured.join('  ')+'  !';
+ }
 }
 function resetAll(){clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}
 window.resetAll=resetAll;

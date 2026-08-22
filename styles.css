@@ -49,3 +49,17 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 
 .rankKey,#spin{touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
 .rankKey span{pointer-events:none}#track{transition:none!important}
+
+#buildVersion{
+  position:fixed;
+  top:24px;
+  right:8px;
+  z-index:9999;
+  font-size:9px;
+  font-weight:400;
+  letter-spacing:.2px;
+  color:rgba(180,180,180,.42);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
