@@ -21,8 +21,8 @@ function advancePhase(){phase++;if(phase===4){finish();return}phase%2?showSuitMo
 
 function installRank(id){
  const b=document.getElementById(id),g=RANK_GROUPS[id];
- b.onpointerdown=e=>{if(phase%2)return;pointerDown=true;holdTriggered=false;b.setPointerCapture(e.pointerId);clearTimeout(holdTimer);holdTimer=setTimeout(()=>{if(pointerDown){holdTriggered=true;captured.push(g[Number(b.dataset.i||0)][1]);updateEcho();advancePhase()}},HOLD_MS)};
- b.onpointerup=()=>{clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(!was&&phase%2===0){let i=(Number(b.dataset.i||0)+1)%g.length;b.dataset.i=i;b.querySelector('span').textContent=g[i][0]}};
+ b.onpointerdown=e=>{if(phase%2)return;pointerDown=true;holdTriggered=false;b.setPointerCapture(e.pointerId);clearTimeout(holdTimer);holdTimer=setTimeout(()=>{if(pointerDown)holdTriggered=true},HOLD_MS)};
+ b.onpointerup=()=>{if(phase%2)return;clearTimeout(holdTimer);let was=holdTriggered;pointerDown=false;holdTriggered=false;if(was){captured.push(g[Number(b.dataset.i||0)][1]);updateEcho();advancePhase();}else{let i=(Number(b.dataset.i||0)+1)%g.length;b.dataset.i=i;b.querySelector('span').textContent=g[i][0]}};
  b.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 }
 ['rank1','rank4','rank7','rank8'].forEach(installRank);
