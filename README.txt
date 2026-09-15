@@ -1,9 +1,14 @@
-VOX V8.4.9 — requested handling/cosmetic pass.
+VOX V8.4.10 — clipboard repair only.
 
 Changes only:
-- 0 delay: 15 seconds -> 8 seconds.
-- Fake/final Home registration: down three background dots (~18 px), top -16px -> +2px.
-- Visible build number: 9px -> 13.5px (150%).
-- Build number: 8.4.9.
+- Final suit HOLD now calls clipboard write directly from the pointerup user gesture.
+- Clipboard path simplified to one immediate navigator.clipboard.writeText() call.
+- Removed triple asynchronous writes and deprecated execCommand fallback.
+- Visible build number and cache-busting references updated to 8.4.10.
 
-V8.4.8 input, Quick route, clipboard, Mnemonica calculation and Emergency machinery unchanged.
+Unchanged:
+- Fake passcode input and rank/suit handling.
+- Quick route / 0 delay (8 seconds).
+- Mnemonica calculation.
+- Fake/final Home.
+- Emergency machinery.
