@@ -90,11 +90,8 @@ function finish(){
 }
 
 function clipboardFailed(){
- // The fourth input was already appended before the clipboard attempt.
- // Remove it so another long press retries with exactly four inputs.
- if(phase===4 && captured.length===4)captured.pop();
- phase=3;
  echo.textContent=captured.join('  ')+'  !';
+ phase=3;
 }
 
 function resetAll(){clearTimeout(notesLockTimer);clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode();showNotes();scheduleLock()}
