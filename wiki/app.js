@@ -68,6 +68,19 @@ spin.onpointerup=()=>{
 };
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 
+// Diagnostic branch only: record the actual browser failure; no retry/fallback changes.
+function clipboardDiagnostic(stage,error){
+ const name=error&&error.name?error.name:'(none)';
+ const message=error&&error.message?error.message:'(no message)';
+ const activation=navigator.userActivation?
+   ('active='+navigator.userActivation.isActive+', ever='+navigator.userActivation.hasBeenActive):
+   'userActivation unavailable';
+ const report=['Clipboard diagnostics','stage: '+stage,'error: '+name,
+   'detail: '+message,'secure: '+isSecureContext,
+   'clipboard API: '+Boolean(navigator.clipboard&&navigator.clipboard.writeText),
+   activation,'phase: '+phase,'captured: '+captured.length].join('\\n');
+ window.alert(report);
+}
 function finish(){
  const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
  const inputtedValue=MNEMONICA[captured[2]+' '+captured[3]];
@@ -81,14 +94,12 @@ function finish(){
        document.getElementById('lock').hidden=true;
        showNotes();
        scheduleLock();
-     }).catch(()=>clipboardFailed());
+     }).catch(error=>{clipboardFailed();clipboardDiagnostic('writeText rejection',error)});
      return;
-   }catch(_){}
+   }catch(error){clipboardFailed();clipboardDiagnostic('writeText exception',error);return}
  }
-
- clipboardFailed();
+ clipboardFailed();clipboardDiagnostic('API unavailable',null);
 }
-
 function clipboardFailed(){
  echo.textContent=captured.join('  ')+'  !';
  phase=3;
