@@ -146,3 +146,7 @@ html,body{background:#fff}
 
 /* 8.6.5: reserve image space immediately so the opening viewport need not wait on image loading. */
 .wikiArticle figure img{width:100%;height:auto;aspect-ratio:4 / 3}
+
+/* MathWorld credit: Wikipedia-like citation with no external navigation. */
+#notes .wikiSource{font-size:12px;line-height:1.45;color:#54595d;margin:9px 0 16px}
+#notes .wikiSource .sourceLink{color:#36c;text-decoration:none;cursor:default}
