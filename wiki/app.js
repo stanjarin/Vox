@@ -109,6 +109,7 @@ const articleImage=notes.querySelector('figure img');
 if(articleImage&&!articleImage.complete){
  articleImage.addEventListener('load',alignOpeningView,{once:true});
  articleImage.addEventListener('error',alignOpeningView,{once:true});
+}else{
+ requestAnimationFrame(alignOpeningView);
 }
-
 scheduleLock();
