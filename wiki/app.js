@@ -96,5 +96,15 @@ document.getElementById('zero').onclick=()=>{if(phase!==2)return;document.getEle
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
 showNotes();
-requestAnimationFrame(()=>{let target=document.getElementById('probabilities');savedArticleScroll=Math.max(0,target.offsetTop-18);restoreArticle()});
+// Start with the lower part of the Canasta photograph visible, as in the accepted iPhone screenshot.
+// Use the heading's actual rendered position, and re-align after the image loads.
+function alignOpeningView(){
+ const target=document.getElementById('probabilities');
+ const headingTop=target.getBoundingClientRect().top-notes.getBoundingClientRect().top+notes.scrollTop;
+ savedArticleScroll=Math.max(0,headingTop-225);
+ restoreArticle();
+}
+requestAnimationFrame(alignOpeningView);
+const articleImage=notes.querySelector('figure img');
+if(articleImage&&!articleImage.complete)articleImage.addEventListener('load',alignOpeningView,{once:true});
 scheduleLock();
