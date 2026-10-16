@@ -105,11 +105,6 @@ function alignOpeningView(){
  restoreArticle();
  notes.style.visibility='visible';
 }
-const articleImage=notes.querySelector('figure img');
-if(articleImage&&!articleImage.complete){
- articleImage.addEventListener('load',alignOpeningView,{once:true});
- articleImage.addEventListener('error',alignOpeningView,{once:true});
-}else{
- requestAnimationFrame(alignOpeningView);
-}
+// Dimensions reserved in HTML/CSS: do not delay initial display for remote imagery.
+requestAnimationFrame(alignOpeningView);
 scheduleLock();
