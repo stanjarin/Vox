@@ -98,3 +98,8 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #notes .notesSheet h1{font-size:19px;font-weight:700}
 #sequences td{font-size:14.667px!important;font-weight:800;letter-spacing:-0.35px}
 #sequences td:nth-child(3){font-size:14.167px!important;font-weight:800;letter-spacing:-0.35px}
+
+/* 8.5.4: remove invented iPhone status bar; unobtrusive visible version. */
+#notes .notesNav{height:44px;padding-top:9px}
+#notes .notesRight{display:flex;align-items:center;gap:12px}
+#notes #notesVersion{font:11px Helvetica,Arial,sans-serif;color:rgba(60,60,60,.35);pointer-events:none}
