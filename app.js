@@ -10,6 +10,14 @@ rank4:[['4','4'],['5','5'],['6','6']],
 rank7:[['7','7'],['8','8'],['9','9']],
 rank8:[['10','10'],['J','J'],['Q','Q'],['K','K']]};
 const SUITS=['C','H','S','D'],HOLD_MS=280;
+// After consulting the chart, show the same simulated passcode screen used by VOX.
+const NOTES_LOCK_DELAY_MS=25000;
+const notes=document.getElementById('notes');
+let notesLockTimer=null;
+function showNotes(){document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('done').hidden=true;notes.hidden=false}
+function showLock(){notes.hidden=true;document.getElementById('lock').hidden=false;clearTimeout(notesLockTimer)}
+function scheduleLock(){clearTimeout(notesLockTimer);notesLockTimer=setTimeout(showLock,NOTES_LOCK_DELAY_MS)}
+(function chart(){const tbody=document.querySelector('#sequences tbody');for(let n=1;n<=12;n++){let tr=document.createElement('tr');let a=document.createElement('td'),b=document.createElement('td');a.textContent=n;b.textContent=(51n**BigInt(n)).toLocaleString('en-AU');tr.append(a,b);tbody.append(tr)}})();
 let phase=0,captured=[],suitIndex=0,holdTimer=null,pointerDown=false,holdTriggered=false;
 const echo=document.getElementById('echo'),spin=document.getElementById('spin'),track=document.getElementById('track');
 
@@ -66,7 +74,7 @@ function finish(){
    try{
      navigator.clipboard.writeText(text).then(()=>{
        document.getElementById('lock').hidden=true;
-       document.getElementById('done').hidden=false;
+       showNotes();
      }).catch(()=>clipboardFailed());
      return;
    }catch(_){}
@@ -80,8 +88,10 @@ function clipboardFailed(){
  phase=3;
 }
 
-function resetAll(){clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}
+function resetAll(){clearTimeout(notesLockTimer);clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode();showNotes();scheduleLock()}
 window.resetAll=resetAll;
 document.getElementById('zero').onclick=()=>{if(phase!==2)return;document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=false;setTimeout(()=>{if(phase===2){document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}},8000)};
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
+showNotes();
+scheduleLock();
