@@ -140,3 +140,6 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #sequences td:nth-child(3) .magnitude{font-size:12px;font-weight:400;letter-spacing:0}
 .wikiBelow{font-size:16px}
 #notes #notesVersion{display:block;text-align:right;color:#a2a9b1;font:10px Arial;margin:30px 0}
+
+/* 8.6.4: neutral white background before the initial article position is ready. */
+html,body{background:#fff}
