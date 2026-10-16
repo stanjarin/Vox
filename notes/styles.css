@@ -103,3 +103,10 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #notes .notesNav{height:44px;padding-top:9px}
 #notes .notesRight{display:flex;align-items:center;gap:12px}
 #notes #notesVersion{font:11px Helvetica,Arial,sans-serif;color:rgba(60,60,60,.35);pointer-events:none}
+
+/* v8.5.5: natural Notes header, non-condensed title, enlarged magnitude words. */
+#notes .notesNav{height:39px;padding:4px 18px 0;align-items:center}
+#notes .notesSheet{padding-top:2px}
+#notes .notesSheet h1{font-family:Helvetica,Arial,sans-serif;font-stretch:normal;font-size:19px;letter-spacing:0;font-weight:700}
+#notes #notesVersion{display:block;position:static;margin:14px 0 0;text-align:right;color:rgba(65,65,65,.32);font:11px Helvetica,Arial,sans-serif}
+#sequences td:nth-child(3) .magnitude{font-size:17px;font-weight:800}
