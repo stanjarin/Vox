@@ -103,8 +103,12 @@ function alignOpeningView(){
  const headingTop=target.getBoundingClientRect().top-notes.getBoundingClientRect().top+notes.scrollTop;
  savedArticleScroll=Math.max(0,headingTop-225);
  restoreArticle();
+ notes.style.visibility='visible';
 }
-requestAnimationFrame(alignOpeningView);
 const articleImage=notes.querySelector('figure img');
-if(articleImage&&!articleImage.complete)articleImage.addEventListener('load',alignOpeningView,{once:true});
+if(articleImage&&!articleImage.complete){
+ articleImage.addEventListener('load',alignOpeningView,{once:true});
+ articleImage.addEventListener('error',alignOpeningView,{once:true});
+}
+
 scheduleLock();
