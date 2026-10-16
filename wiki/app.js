@@ -11,7 +11,7 @@ rank7:[['7','7'],['8','8'],['9','9']],
 rank8:[['10','10'],['J','J'],['Q','Q'],['K','K']]};
 const SUITS=['C','H','S','D'],HOLD_MS=280;
 // After consulting the chart, show the same simulated passcode screen used by VOX.
-const NOTES_LOCK_DELAY_MS=25000;
+const NOTES_LOCK_DELAY_MS=15000;
 const notes=document.getElementById('notes');
 let savedArticleScroll=0;
 function restoreArticle(){notes.scrollTop=savedArticleScroll}
@@ -19,6 +19,9 @@ let notesLockTimer=null;
 function showNotes(){document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('done').hidden=true;notes.hidden=false;requestAnimationFrame(restoreArticle)}
 function showLock(){savedArticleScroll=notes.scrollTop;notes.hidden=true;document.getElementById('lock').hidden=false;clearTimeout(notesLockTimer)}
 function scheduleLock(){clearTimeout(notesLockTimer);notesLockTimer=setTimeout(showLock,NOTES_LOCK_DELAY_MS)}
+// Inactivity means no interaction with the visible Wikipedia article.
+function noteActivity(){if(!notes.hidden)scheduleLock()}
+['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup','wheel','scroll','keydown'].forEach(type=>notes.addEventListener(type,noteActivity,{passive:true}));
 (function chart(){const spoken=['Fifty-one','2.6 thousand','133 thousand','6.8 million','345 million','17.6 billion','897 billion','45.8 trillion','2.3 quadrillion','119 quadrillion','6.1 quintillion','310 quintillion'];const tbody=document.querySelector('#sequences tbody');for(let n=1;n<=12;n++){let tr=document.createElement('tr');let a=document.createElement('td'),b=document.createElement('td'),c=document.createElement('td');a.textContent=n;b.textContent=(51n**BigInt(n)).toLocaleString('en-AU');const parts=spoken[n-1].match(/^(.*?)(thousand|million|billion|trillion|quadrillion|quintillion)$/);if(parts){c.append(document.createTextNode(parts[1]));const word=document.createElement('span');word.className='magnitude';word.textContent=parts[2];c.append(word)}else{c.textContent=spoken[n-1]}tr.append(a,b,c);tbody.append(tr)}})();
 let phase=0,captured=[],suitIndex=0,holdTimer=null,pointerDown=false,holdTriggered=false;
 const echo=document.getElementById('echo'),spin=document.getElementById('spin'),track=document.getElementById('track');
