@@ -77,6 +77,7 @@ function finish(){
      navigator.clipboard.writeText(text).then(()=>{
        document.getElementById('lock').hidden=true;
        showNotes();
+       scheduleLock();
      }).catch(()=>clipboardFailed());
      return;
    }catch(_){}
