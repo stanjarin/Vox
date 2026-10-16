@@ -1,0 +1,142 @@
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;overflow:hidden}
+#lock{position:fixed;inset:0;background:#222 url('../lock-tile.png') 0 0/100vw 100vw repeat-y}
+.top{position:absolute;top:65px;left:0;right:0;text-align:center;font-size:20px}.lockicon{position:relative;width:24px;height:30px;margin:0 auto 30px}
+.shackle{position:absolute;left:5px;top:0;width:14px;height:15px;border:2px solid #fff;border-bottom:0;border-radius:9px 9px 0 0}
+.lockbody{position:absolute;left:2px;top:12px;width:20px;height:17px;background:#fff;border-radius:2px}
+#echo{height:42px;width:252px;margin:10px auto 0;border:1px solid rgba(255,255,255,.18);border-radius:5px;font-size:22px;letter-spacing:7px;color:#888;text-align:left;padding:7px 10px;white-space:pre}
+.pad{position:absolute;top:235px;left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,76px);grid-auto-rows:76px;gap:14px 18px}
+.pad button,.key{width:76px;height:76px;border:0;border-radius:50%;background:#3b3b3d;color:white;font-size:31px;font-weight:300;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pad button:not(#zero):not(.rankKey){pointer-events:none}.pad small{font-size:8px;letter-spacing:1px;height:10px}.pad i{width:76px}
+.spin{position:relative;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;pointer-events:auto}
+#track{position:absolute;left:0;right:0;top:0;will-change:transform}
+.witem{height:76px;display:flex;align-items:center;justify-content:center;font-size:31px;font-weight:300}
+#zero{cursor:pointer}
+#reset,#cancel{position:absolute;bottom:35px;background:none;border:0;color:white;font-size:16px;text-decoration:underline}
+#reset{left:28px}#cancel{right:28px}
+#fake{position:fixed;inset:0;background:#000}
+#fake[hidden]{display:none}
+#done{position:fixed;inset:0;background:#f2f2f7;color:#111;padding:65px 28px}#done p{font-size:24px}
+
+#done #calc,#done #clip{font-size:20px}#done #clip{font-weight:600}
+
+#done{position:fixed;inset:0;background:#000;padding:0}.doneHome{position:absolute;inset:0;background:#000}
+
+#fake img,#done img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+#done{position:fixed;inset:0;background:#000;padding:0}
+
+#fake,#done{position:fixed;inset:0;background:transparent;padding:0;overflow:hidden}
+#fake img,#done img{position:absolute;left:0;top:18px;width:100%;height:calc(100% - 18px);object-fit:fill;display:block}
+
+.rankKey{touch-action:none;user-select:none;-webkit-user-select:none}
+.rankKey span{display:block;line-height:1}
+#fake,#done{position:fixed;inset:0;background:transparent;padding:0;overflow:hidden}
+#fake img,#done img{
+  position:absolute;
+  left:0;
+  top:2px;          /* V8.4.9: down three background dots (~18px) */
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.rankKey,#spin{touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+.rankKey span{pointer-events:none}#track{transition:none!important}
+
+#buildVersion{
+  position:fixed;
+  top:24px;
+  right:8px;
+  z-index:9999;
+  font-size:13.5px;
+  font-weight:400;
+  letter-spacing:.2px;
+  color:rgba(180,180,180,.42);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* VOX 8.5.0 simulated Notes chart. Original keypad and calculation styles unchanged. */
+#lock[hidden],#notes[hidden],#done[hidden]{display:none!important}
+#notes{position:fixed;inset:0;overflow:auto;background:#f9f9fb;color:#151515;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+.notesStatus{height:32px;padding:10px 22px 0;font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.notesNav{height:44px;padding:10px 18px;color:#bf8733;font-size:17px;display:flex;justify-content:space-between}
+.notesSheet{padding:8px 19px 35px}
+.notesSheet h1{font-size:25px;margin:4px 0 8px;font-weight:700}
+.notesIntro{font-size:13px;color:#777;margin:0 0 12px}
+#sequences{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:15px}
+#sequences th{font-size:12px;color:#666;text-align:left;padding:7px 5px;border-bottom:1px solid #ddd}
+#sequences td{padding:6px 5px;border-bottom:1px solid #e6e6e6}
+#sequences td:last-child{text-align:right;font-size:14px}
+#sequences th:last-child{text-align:right}
+.notesFoot{font-size:12px;color:#777;line-height:1.4}
+
+/* 8.5.1: bold, compact, left-ranged Notes figures. */
+#sequences{width:auto;table-layout:auto;font-weight:700}
+#sequences th,#sequences td{font-weight:700;text-align:left!important}
+#sequences th:first-child,#sequences td:first-child{padding-right:1em}
+#sequences th:last-child,#sequences td:last-child{padding-left:0;text-align:left!important;font-weight:700}
+
+/* 8.5.2: more casual Notes chart; three columns, no captions. */
+.notesSheet h1{font-size:21.667px}
+#sequences{width:100%;table-layout:auto;font-size:12px}
+#sequences td{padding:6px 0;border-bottom:0;vertical-align:top;white-space:nowrap;font-size:12px!important}
+#sequences td:first-child{padding-right:1em}
+#sequences td:nth-child(2){padding-right:0.8em}
+#sequences td:nth-child(3){text-align:left!important;font-size:11.5px!important;font-weight:600}
+
+/* Notes typography 8.5.3 — condensed bold, larger table. */
+#notes .notesSheet{font-family:"Arial Narrow","Helvetica Neue Condensed Bold","Roboto Condensed","Helvetica Neue",Arial,sans-serif;font-stretch:condensed;font-weight:700}
+#notes .notesSheet h1{font-size:19px;font-weight:700}
+#sequences td{font-size:14.667px!important;font-weight:800;letter-spacing:-0.35px}
+#sequences td:nth-child(3){font-size:14.167px!important;font-weight:800;letter-spacing:-0.35px}
+
+/* 8.5.4: remove invented iPhone status bar; unobtrusive visible version. */
+#notes .notesNav{height:44px;padding-top:9px}
+#notes .notesRight{display:flex;align-items:center;gap:12px}
+#notes #notesVersion{font:11px Helvetica,Arial,sans-serif;color:rgba(60,60,60,.35);pointer-events:none}
+
+/* v8.5.5: natural Notes header, non-condensed title, enlarged magnitude words. */
+#notes .notesNav{height:39px;padding:4px 18px 0;align-items:center}
+#notes .notesSheet{padding-top:2px}
+#notes .notesSheet h1{font-family:Helvetica,Arial,sans-serif;font-stretch:normal;font-size:19px;letter-spacing:0;font-weight:700}
+#notes #notesVersion{display:block;position:static;margin:14px 0 0;text-align:right;color:rgba(65,65,65,.32);font:11px Helvetica,Arial,sans-serif}
+#sequences td:nth-child(3) .magnitude{font-size:17px;font-weight:800}
+
+/* v8.5.6 final typography */
+#notes .notesSheet h1{font-size:16px}
+#sequences td:nth-child(3) .magnitude{letter-spacing:.45px}
+
+/* Wiki prototype: 8.6.0; VOX keypad styles remain untouched */
+#notes{background:#fff;color:#202122;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;overflow:auto}
+.wikiTop{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:4px 16px;font-size:15px;color:#54595d;border-bottom:1px solid #eaecf0}
+.wikiTop span{color:#54595d;font-size:22px}
+.wikiArticle{padding:0 16px 48px;font-size:16px;line-height:1.65}
+.wikiArticle h1,.wikiArticle h2{font-family:Georgia,"Times New Roman",serif;font-weight:400}
+.wikiArticle h1{font-size:29px;border-bottom:1px solid #a2a9b1}
+.wikiArticle p{margin:12px 0 20px}
+.wikiArticle .sectionHead{display:flex;align-items:center;gap:8px;font-size:28px;margin:23px 0 3px;line-height:1.4}
+.wikiArticle .sectionHead .edit{margin-left:auto;font:24px Arial;color:#54595d}
+.wikiArticle .sectionHead .caret{font:24px Arial;color:#54595d}
+.wikiArticle .rule{height:1px;background:#a2a9b1;margin:8px 0 15px}
+.wikiArticle a{color:#36c}
+.wikiArticle figure{margin:20px auto 40px;width:76%}
+.wikiArticle figure img{max-width:100%;display:block;margin:auto}
+.wikiArticle figcaption{font-size:14px;color:#54595d;line-height:1.4;margin-top:8px}
+#sequences{width:100%;table-layout:auto;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:400}
+#sequences th{font-size:12px;font-weight:600;text-align:left!important;border-bottom:1px solid #a2a9b1;padding:7px 3px}
+#sequences td{font-size:12px!important;font-weight:400;letter-spacing:-.2px;white-space:nowrap;padding:6px 3px;border-bottom:1px solid #eaecf0}
+#sequences td:first-child{padding-right:6px}
+#sequences td:nth-child(2){padding-right:6px}
+#sequences td:nth-child(3){font-size:12px!important;font-weight:400;letter-spacing:-.2px}
+#sequences td:nth-child(3) .magnitude{font-size:12px;font-weight:400;letter-spacing:0}
+.wikiBelow{font-size:16px}
+#notes #notesVersion{display:block;text-align:right;color:#a2a9b1;font:10px Arial;margin:30px 0}
