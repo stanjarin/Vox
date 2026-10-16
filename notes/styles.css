@@ -92,3 +92,9 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 #sequences td:first-child{padding-right:1em}
 #sequences td:nth-child(2){padding-right:0.8em}
 #sequences td:nth-child(3){text-align:left!important;font-size:11.5px!important;font-weight:600}
+
+/* Notes typography 8.5.3 — condensed bold, larger table. */
+#notes .notesSheet{font-family:"Arial Narrow","Helvetica Neue Condensed Bold","Roboto Condensed","Helvetica Neue",Arial,sans-serif;font-stretch:condensed;font-weight:700}
+#notes .notesSheet h1{font-size:19px;font-weight:700}
+#sequences td{font-size:14.667px!important;font-weight:800;letter-spacing:-0.35px}
+#sequences td:nth-child(3){font-size:14.167px!important;font-weight:800;letter-spacing:-0.35px}
