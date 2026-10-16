@@ -143,3 +143,6 @@ html,body{margin:0;height:100%;background:#080808;color:white;font-family:-apple
 
 /* 8.6.4: neutral white background before the initial article position is ready. */
 html,body{background:#fff}
+
+/* 8.6.5: reserve image space immediately so the opening viewport need not wait on image loading. */
+.wikiArticle figure img{width:100%;height:auto;aspect-ratio:4 / 3}
