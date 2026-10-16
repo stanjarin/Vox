@@ -17,7 +17,7 @@ let notesLockTimer=null;
 function showNotes(){document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('done').hidden=true;notes.hidden=false}
 function showLock(){notes.hidden=true;document.getElementById('lock').hidden=false;clearTimeout(notesLockTimer)}
 function scheduleLock(){clearTimeout(notesLockTimer);notesLockTimer=setTimeout(showLock,NOTES_LOCK_DELAY_MS)}
-(function chart(){const tbody=document.querySelector('#sequences tbody');for(let n=1;n<=12;n++){let tr=document.createElement('tr');let a=document.createElement('td'),b=document.createElement('td');a.textContent=n;b.textContent=(51n**BigInt(n)).toLocaleString('en-AU');tr.append(a,b);tbody.append(tr)}})();
+(function chart(){const spoken=['Fifty-one','2.6 thousand','133 thousand','6.8 million','345 million','17.6 billion','897 billion','45.8 trillion','2.3 quadrillion','119 quadrillion','6.1 quintillion','310 quintillion'];const tbody=document.querySelector('#sequences tbody');for(let n=1;n<=12;n++){let tr=document.createElement('tr');let a=document.createElement('td'),b=document.createElement('td'),c=document.createElement('td');a.textContent=n;b.textContent=(51n**BigInt(n)).toLocaleString('en-AU');c.textContent=spoken[n-1];tr.append(a,b,c);tbody.append(tr)}})();
 let phase=0,captured=[],suitIndex=0,holdTimer=null,pointerDown=false,holdTriggered=false;
 const echo=document.getElementById('echo'),spin=document.getElementById('spin'),track=document.getElementById('track');
 
