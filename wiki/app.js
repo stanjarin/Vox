@@ -109,23 +109,10 @@ function undoLastInput(){
 document.getElementById('cancel').onclick=undoLastInput;
 
 const zero=document.getElementById('zero');
-let zeroHoldTimer=null,zeroHoldArmed=false;
-zero.addEventListener('pointerdown',e=>{
- if(phase!==4)return;
- zeroHoldArmed=false;
- zero.setPointerCapture(e.pointerId);
- clearTimeout(zeroHoldTimer);
- zeroHoldTimer=setTimeout(()=>{zeroHoldArmed=true},HOLD_MS);
-});
+// Confirm the four reviewed inputs with an ordinary tap, during the user gesture.
 zero.addEventListener('pointerup',()=>{
- if(phase!==4)return;
- clearTimeout(zeroHoldTimer);
- const confirmed=zeroHoldArmed;
- zeroHoldArmed=false;
- if(confirmed && captured.length===4)finish();
+ if(phase===4 && captured.length===4)finish();
 });
-zero.addEventListener('pointercancel',()=>{clearTimeout(zeroHoldTimer);zeroHoldArmed=false});
-// Zero is reserved exclusively for long-press confirmation after four inputs.
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
 showNotes();
