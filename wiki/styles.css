@@ -153,3 +153,9 @@ html,body{background:#fff}
 
 /* Emphasise Cuts and Approx. figures; keep possible-sequences column regular. */
 #sequences tbody td:first-child,#sequences tbody td:nth-child(3),#sequences tbody td:nth-child(3) .magnitude{font-weight:900}
+
+/* VOX lock-screen polish: lift keypad and heading; increase passcode visibility. */
+#lock .top{top:42px}
+#lock .pad{top:212px}
+#lock #echo{border:2px solid rgba(255,255,255,.38);background:rgba(255,255,255,.09);color:#f1f1f1}
+#lock #reset,#lock #cancel{bottom:55px}
