@@ -173,3 +173,6 @@ html,body{background:#fff}
 /* Smaller circular passcode indicators; subdued entered values. */
 #lock #echo{width:220px;height:42px;grid-template-columns:repeat(4,42px);gap:17.33px;justify-content:center}
 #lock #echo .slot{width:42px;height:42px;border-radius:50%;color:rgba(255,255,255,.75);font-size:19px}
+
+/* Match rank-key long-press touch handling for the zero confirm key. */
+#lock #zero{touch-action:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
