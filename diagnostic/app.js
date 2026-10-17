@@ -26,11 +26,15 @@ function noteActivity(){if(!notes.hidden)scheduleLock()}
 let phase=0,captured=[],suitIndex=0,holdTimer=null,pointerDown=false,holdTriggered=false;
 const echo=document.getElementById('echo'),spin=document.getElementById('spin'),track=document.getElementById('track');
 
-function updateEcho(){echo.textContent=captured.join('  ')}
+function updateEcho(){
+ const slots=echo.querySelectorAll('.slot');
+ slots.forEach((slot,i)=>{slot.textContent=captured[i]||''});
+ echo.classList.remove('copyFailed');
+}
 function resetRankKeys(){Object.entries(RANK_GROUPS).forEach(([id,g])=>{let b=document.getElementById(id);b.dataset.i='0';b.querySelector('span').textContent=g[0][0]})}
 function showRankMode(){track.innerHTML='<div class="witem">9</div>';spin.style.pointerEvents='none';resetRankKeys();updateEcho()}
 function showSuitMode(){suitIndex=0;track.innerHTML='<div class="witem">C</div>';spin.style.pointerEvents='auto';updateEcho()}
-function advancePhase(){phase++;if(phase===4){finish();return}phase%2?showSuitMode():showRankMode()}
+function advancePhase(){phase++;if(phase===4)return;phase%2?showSuitMode():showRankMode()}
 
 function installRank(id){
  const b=document.getElementById(id),g=RANK_GROUPS[id];
@@ -57,29 +61,26 @@ spin.onpointerup=()=>{
  captured.push(SUITS[suitIndex]);
  updateEcho();
 
- // V8.4.10: on the final suit, write once to the clipboard directly
- // from this pointerup user gesture. Do not route through advancePhase().
- if(phase===3){
-   phase=4;
-   finish();
-   return;
- }
+ // Fourth value remains visible until explicit confirmation on zero.
  advancePhase();
 };
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
 
-// Diagnostic branch only: record the actual browser failure; no retry/fallback changes.
-function clipboardDiagnostic(stage,error){
- const name=error&&error.name?error.name:'(none)';
- const message=error&&error.message?error.message:'(no message)';
- const activation=navigator.userActivation?
-   ('active='+navigator.userActivation.isActive+', ever='+navigator.userActivation.hasBeenActive):
-   'userActivation unavailable';
- const report=['Clipboard diagnostics','stage: '+stage,'error: '+name,
-   'detail: '+message,'secure: '+isSecureContext,
-   'clipboard API: '+Boolean(navigator.clipboard&&navigator.clipboard.writeText),
-   activation,'phase: '+phase,'captured: '+captured.length].join('\\n');
- window.alert(report);
+let clipboardGestureSnapshot='not recorded';
+function captureClipboardGesture(stage){
+ const ua=navigator.userActivation;
+ return stage+': '+(ua?('active='+ua.isActive+', ever='+ua.hasBeenActive):'userActivation unsupported');
+}
+function showClipboardDiagnostic(stage,error){
+ const lines=['Clipboard diagnostic','stage: '+stage,
+ 'error: '+(error?.name||'(none)'),
+ 'detail: '+(error?.message||'(none)'),
+ 'at 0 release: '+clipboardGestureSnapshot,
+ 'now: '+captureClipboardGesture('result'),
+ 'secure context: '+isSecureContext,
+ 'clipboard API: '+Boolean(navigator.clipboard?.writeText),
+ 'phase: '+phase+', entries: '+captured.length];
+ alert(lines.join('\n'));
 }
 function finish(){
  const namedValue=MNEMONICA[captured[0]+' '+captured[1]];
@@ -90,19 +91,23 @@ function finish(){
 
  if(navigator.clipboard && navigator.clipboard.writeText){
    try{
+     clipboardGestureSnapshot=captureClipboardGesture('before writeText');
      navigator.clipboard.writeText(text).then(()=>{
        document.getElementById('lock').hidden=true;
        showNotes();
        scheduleLock();
-     }).catch(error=>{clipboardFailed();clipboardDiagnostic('writeText rejection',error)});
+     }).catch(error=>{clipboardFailed();showClipboardDiagnostic('promise rejection',error)});
      return;
-   }catch(error){clipboardFailed();clipboardDiagnostic('writeText exception',error);return}
+   }catch(error){clipboardFailed();showClipboardDiagnostic('synchronous exception',error);return}
  }
- clipboardFailed();clipboardDiagnostic('API unavailable',null);
+
+ clipboardFailed();showClipboardDiagnostic('API unavailable',null);
 }
+
 function clipboardFailed(){
- echo.textContent=captured.join('  ')+'  !';
- phase=3;
+ updateEcho();echo.classList.add('copyFailed');
+ // Keep four entries intact so Cancel and a fresh confirmation remain available.
+ phase=4;
 }
 
 function resetAll(){clearTimeout(notesLockTimer);clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode();showNotes();scheduleLock()}
@@ -120,7 +125,24 @@ function undoLastInput(){
 }
 document.getElementById('cancel').onclick=undoLastInput;
 
-document.getElementById('zero').onclick=()=>{if(phase!==2)return;document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=false;setTimeout(()=>{if(phase===2){document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}},8000)};
+const zero=document.getElementById('zero');
+let zeroHoldTimer=null,zeroHoldArmed=false;
+zero.addEventListener('pointerdown',e=>{
+ if(phase!==4)return;
+ zeroHoldArmed=false;
+ zero.setPointerCapture(e.pointerId);
+ clearTimeout(zeroHoldTimer);
+ zeroHoldTimer=setTimeout(()=>{zeroHoldArmed=true},HOLD_MS);
+});
+zero.addEventListener('pointerup',()=>{
+ if(phase!==4)return;
+ clearTimeout(zeroHoldTimer);
+ const confirmed=zeroHoldArmed;
+ zeroHoldArmed=false;
+ if(confirmed && captured.length===4){clipboardGestureSnapshot=captureClipboardGesture('0 pointerup');finish();}
+});
+zero.addEventListener('pointercancel',()=>{clearTimeout(zeroHoldTimer);zeroHoldArmed=false});
+// Zero is reserved exclusively for long-press confirmation after four inputs.
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
 showNotes();
