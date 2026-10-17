@@ -125,7 +125,7 @@ zero.addEventListener('pointerup',()=>{
  if(confirmed && captured.length===4)finish();
 });
 zero.addEventListener('pointercancel',()=>{clearTimeout(zeroHoldTimer);zeroHoldArmed=false});
-document.getElementById('zero').onclick=()=>{if(phase!==2)return;document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=false;setTimeout(()=>{if(phase===2){document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}},8000)};
+// Zero is reserved exclusively for long-press confirmation after four inputs.
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
 showNotes();
