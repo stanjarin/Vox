@@ -139,10 +139,13 @@ zero.addEventListener('pointerup',()=>{
  clearTimeout(zeroHoldTimer);
  const confirmed=zeroHoldArmed;
  zeroHoldArmed=false;
- if(confirmed && captured.length===4){clipboardGestureSnapshot=captureClipboardGesture('0 pointerup');finish();}
+ if(captured.length===4){
+   clipboardGestureSnapshot=captureClipboardGesture(confirmed?'0 long-press release':'0 short-tap release');
+   finish();
+ }
 });
 zero.addEventListener('pointercancel',()=>{clearTimeout(zeroHoldTimer);zeroHoldArmed=false});
-// Zero is reserved exclusively for long-press confirmation after four inputs.
+// Diagnostic only: both short tap and long press confirm, to compare clipboard permission behaviour.
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
 showNotes();
