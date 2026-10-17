@@ -34,7 +34,7 @@ function updateEcho(){
 function resetRankKeys(){Object.entries(RANK_GROUPS).forEach(([id,g])=>{let b=document.getElementById(id);b.dataset.i='0';b.querySelector('span').textContent=g[0][0]})}
 function showRankMode(){track.innerHTML='<div class="witem">9</div>';spin.style.pointerEvents='none';resetRankKeys();updateEcho()}
 function showSuitMode(){suitIndex=0;track.innerHTML='<div class="witem">C</div>';spin.style.pointerEvents='auto';updateEcho()}
-function advancePhase(){phase++;if(phase===4){finish();return}phase%2?showSuitMode():showRankMode()}
+function advancePhase(){phase++;if(phase===4)return;phase%2?showSuitMode():showRankMode()}
 
 function installRank(id){
  const b=document.getElementById(id),g=RANK_GROUPS[id];
@@ -61,13 +61,7 @@ spin.onpointerup=()=>{
  captured.push(SUITS[suitIndex]);
  updateEcho();
 
- // V8.4.10: on the final suit, write once to the clipboard directly
- // from this pointerup user gesture. Do not route through advancePhase().
- if(phase===3){
-   phase=4;
-   finish();
-   return;
- }
+ // Fourth value remains visible until explicit confirmation on zero.
  advancePhase();
 };
 spin.onpointercancel=()=>{clearTimeout(holdTimer);pointerDown=false;holdTriggered=false};
@@ -95,7 +89,8 @@ function finish(){
 
 function clipboardFailed(){
  updateEcho();echo.classList.add('copyFailed');
- phase=3;
+ // Keep four entries intact so Cancel and a fresh confirmation remain available.
+ phase=4;
 }
 
 function resetAll(){clearTimeout(notesLockTimer);clearTimeout(holdTimer);phase=0;captured=[];suitIndex=0;pointerDown=false;holdTriggered=false;document.getElementById('done').hidden=true;document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode();showNotes();scheduleLock()}
@@ -113,6 +108,23 @@ function undoLastInput(){
 }
 document.getElementById('cancel').onclick=undoLastInput;
 
+const zero=document.getElementById('zero');
+let zeroHoldTimer=null,zeroHoldArmed=false;
+zero.addEventListener('pointerdown',e=>{
+ if(phase!==4)return;
+ zeroHoldArmed=false;
+ zero.setPointerCapture(e.pointerId);
+ clearTimeout(zeroHoldTimer);
+ zeroHoldTimer=setTimeout(()=>{zeroHoldArmed=true},HOLD_MS);
+});
+zero.addEventListener('pointerup',()=>{
+ if(phase!==4)return;
+ clearTimeout(zeroHoldTimer);
+ const confirmed=zeroHoldArmed;
+ zeroHoldArmed=false;
+ if(confirmed && captured.length===4)finish();
+});
+zero.addEventListener('pointercancel',()=>{clearTimeout(zeroHoldTimer);zeroHoldArmed=false});
 document.getElementById('zero').onclick=()=>{if(phase!==2)return;document.getElementById('lock').hidden=true;document.getElementById('fake').hidden=false;setTimeout(()=>{if(phase===2){document.getElementById('fake').hidden=true;document.getElementById('lock').hidden=false;showRankMode()}},8000)};
 document.getElementById('reset').onclick=resetAll;
 showRankMode();
