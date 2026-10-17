@@ -150,3 +150,6 @@ html,body{background:#fff}
 /* MathWorld credit: Wikipedia-like citation with no external navigation. */
 #notes .wikiSource{font-size:12px;line-height:1.45;color:#54595d;margin:9px 0 16px}
 #notes .wikiSource .sourceLink{color:#36c;text-decoration:none;cursor:default}
+
+/* Emphasise Cuts and Approx. figures; keep possible-sequences column regular. */
+#sequences tbody td:first-child,#sequences tbody td:nth-child(3),#sequences tbody td:nth-child(3) .magnitude{font-weight:700}
