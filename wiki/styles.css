@@ -152,4 +152,4 @@ html,body{background:#fff}
 #notes .wikiSource .sourceLink{color:#36c;text-decoration:none;cursor:default}
 
 /* Emphasise Cuts and Approx. figures; keep possible-sequences column regular. */
-#sequences tbody td:first-child,#sequences tbody td:nth-child(3),#sequences tbody td:nth-child(3) .magnitude{font-weight:700}
+#sequences tbody td:first-child,#sequences tbody td:nth-child(3),#sequences tbody td:nth-child(3) .magnitude{font-weight:900}
