@@ -162,3 +162,10 @@ html,body{background:#fff}
 
 /* Anchor auxiliary controls below keypad row 4 (zero), independent of viewport/browser chrome. */
 #lock #reset,#lock #cancel{top:570px;bottom:auto}
+
+/* Four visual input slots. Existing VOX values, phases and controls unchanged. */
+#lock #echo{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:268px;height:46px;padding:0;margin:10px auto 0;border:0;background:none;letter-spacing:normal;overflow:visible}
+#lock #echo .slot{height:46px;border:2px solid rgba(255,255,255,.43);border-radius:7px;background:rgba(255,255,255,.10);color:#f1f1f1;font-size:23px;font-weight:400;display:flex;align-items:center;justify-content:center;position:relative}
+#lock #echo.copyFailed .slot:last-child::after{content:'!';position:absolute;right:-7px;top:-15px;font-size:18px;font-weight:700;color:#fff}
+/* Bottom controls are fixed in the keypad's coordinate system, just below zero. */
+#lock #reset,#lock #cancel{top:calc(212px + 3 * (76px + 14px) + 76px + 14px);bottom:auto}
