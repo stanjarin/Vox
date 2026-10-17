@@ -26,7 +26,11 @@ function noteActivity(){if(!notes.hidden)scheduleLock()}
 let phase=0,captured=[],suitIndex=0,holdTimer=null,pointerDown=false,holdTriggered=false;
 const echo=document.getElementById('echo'),spin=document.getElementById('spin'),track=document.getElementById('track');
 
-function updateEcho(){echo.textContent=captured.join('  ')}
+function updateEcho(){
+ const slots=echo.querySelectorAll('.slot');
+ slots.forEach((slot,i)=>{slot.textContent=captured[i]||''});
+ echo.classList.remove('copyFailed');
+}
 function resetRankKeys(){Object.entries(RANK_GROUPS).forEach(([id,g])=>{let b=document.getElementById(id);b.dataset.i='0';b.querySelector('span').textContent=g[0][0]})}
 function showRankMode(){track.innerHTML='<div class="witem">9</div>';spin.style.pointerEvents='none';resetRankKeys();updateEcho()}
 function showSuitMode(){suitIndex=0;track.innerHTML='<div class="witem">C</div>';spin.style.pointerEvents='auto';updateEcho()}
@@ -90,7 +94,7 @@ function finish(){
 }
 
 function clipboardFailed(){
- echo.textContent=captured.join('  ')+'  !';
+ updateEcho();echo.classList.add('copyFailed');
  phase=3;
 }
 
