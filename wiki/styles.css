@@ -159,3 +159,6 @@ html,body{background:#fff}
 #lock .pad{top:212px}
 #lock #echo{border:2px solid rgba(255,255,255,.38);background:rgba(255,255,255,.09);color:#f1f1f1}
 #lock #reset,#lock #cancel{bottom:55px}
+
+/* Anchor auxiliary controls below keypad row 4 (zero), independent of viewport/browser chrome. */
+#lock #reset,#lock #cancel{top:570px;bottom:auto}
